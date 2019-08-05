@@ -9,11 +9,11 @@
 
     <application
         android:icon="@mipmap/icon"
-        android:label="tripdb"
+        android:label="Moje wycieczki"
 	android:debuggable="true">
         <activity
             android:name="me.leo.tripdb.MainActivity"
-            android:label="tripdb">
+            android:label="Moje wycieczki">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
