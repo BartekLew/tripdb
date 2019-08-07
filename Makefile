@@ -26,7 +26,7 @@ target/code/me target/tripdb.ap_: res/layout/main.xml AndroidManifest.xml
 
 target/tripdb.apk: classes.dex target/tripdb.ap_
 	${AAPT} add target/tripdb.ap_ $<
-	${JARSIGNER} -keystore leo.keystore -signedjar $@ target/tripdb.ap_ tripdb
+	${JARSIGNER} -keystore leo.keystore -storepass 123456 -signedjar $@ target/tripdb.ap_ tripdb
 	rm target/tripdb.ap_
 
 

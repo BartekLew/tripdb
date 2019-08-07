@@ -11,6 +11,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
+import android.view.View;
+import android.view.View.OnClickListener;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
@@ -22,16 +28,117 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
+		rootView = findViewById(R.id.main);
+		single = this;
+
+		handler = new AddButtonAction(this, findViewById(R.id.add));
 		trips = new TripList(this, findViewById(R.id.trips));
 	}
 
+	public static Activity get() { return single; }
+	public static View root() {return rootView;}
+
+	static Activity single;
+	static View rootView;
 	TripList trips;
+
+	class AddButtonAction implements OnClickListener {
+		public AddButtonAction (Activity activity, View button) {
+			a = activity;
+			button.setOnClickListener(this);
+		}
+
+		public void onClick (View button) {
+			setContentView(rootView = new DefaultLayout(
+				LinearLayout.HORIZONTAL, DefaultLayout.fillBoth
+			).with(new TripItem().editor(a, root())));
+;
+		}
+
+		Activity a;
+	}
+	AddButtonAction handler;
+}
+
+class DefaultWidget<T extends View> {
+	public DefaultWidget(T base) {
+		control = base;
+		LayoutParams lparams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		base.setLayoutParams(lparams);
+	}
+
+	public T commit() {return control;}
+
+	T control;
+}
+
+class DefaultLayout extends LinearLayout {
+	public static int horizontalFill = 1;
+	public static int verticalFill = 2;
+	public static int fillBoth = 3;
+
+	public DefaultLayout (int orientation, int fillType) {
+		super(MainActivity.get());
+		setOrientation(orientation);
+		setLayoutParams(new LayoutParams(
+			((fillType & horizontalFill) != 0)? LayoutParams.FILL_PARENT : LayoutParams.WRAP_CONTENT,
+			((fillType & verticalFill) != 0)? LayoutParams.FILL_PARENT : LayoutParams.WRAP_CONTENT
+		));
+		setPadding(10, 10, 10, 10);
+	}
+
+	public DefaultLayout with(View v) {
+		addView(v);
+		return this;
+	}
+}
+
+
+class TextWidget extends EditText {
+	public TextWidget() {
+		super(MainActivity.get());
+
+		setLayoutParams(new LayoutParams(
+			LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT
+		));
+
+		setTextAppearance(MainActivity.get(), android.R.attr.textAppearanceLarge);
+	}
+
+	public TextWidget withText(String s) {
+		setText(s);
+		return this;
+	}
+
+	public TextWidget withHint (String hint) {
+		setHint(hint);
+		return this;
+	}
+
+	public TextWidget withWidth(int pt) {
+		setWidth (pt);
+		return this;
+	}
+}
+
+class Space extends TextView {
+	public Space(int w, int h) {
+		super(MainActivity.get());
+		setWidth(w);
+		setHeight(h);
+	}
 }
 
 class TripItem {
 	public TripItem (JSONObject o) {
 		data = o;
 	}	
+
+	public TripItem () {
+		data = new JSONObject();
+		data.put("where", "");
+		data.put("when", "");
+	}
 		
 	public TripItem (String where, LocalDateTime when) {
 		data.put("where", where);
@@ -40,6 +147,14 @@ class TripItem {
 
 	public String where() { return data.get("where").toString(); }
 	public String when() { return data.get("when").toString(); }
+
+	public View editor(Activity a, View parent) {
+		int size = parent.getWidth() / 2 - 30;
+		return new DefaultLayout(LinearLayout.HORIZONTAL, DefaultLayout.horizontalFill)
+			.with(new TextWidget().withWidth(size).withHint("gdzie?"))
+			.with(new Space(20, 0))
+			.with(new TextWidget().withWidth(size).withHint("kiedy?"));
+	}
 		
 	@Override
 	public String toString() {
