@@ -22,7 +22,9 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
@@ -42,10 +44,10 @@ public class MainActivity extends Activity {
 	}
 
 	public static Activity get() { return single; }
-	public static View root() {return rootView;}
+	public static ViewGroup root() {return rootView;}
 
 	static Activity single;
-	static View rootView;
+	static ViewGroup rootView;
 	TripList trips;
 
 	class AddButtonAction implements OnClickListener {
@@ -56,8 +58,8 @@ public class MainActivity extends Activity {
 
 		public void onClick (View button) {
 			setContentView(rootView = new DefaultLayout(
-				LinearLayout.HORIZONTAL, DefaultLayout.fillBoth
-			).with(new TripItem().editor(a, root())));
+				LinearLayout.VERTICAL, DefaultLayout.fillBoth
+			).with(new TripItem().editor(a, root().getWidth())));
 		}
 
 		Activity a;
@@ -138,6 +140,18 @@ class TextWidget extends EditText {
 		setWidth (pt);
 		return this;
 	}
+
+	public TextWidget withFocus() {
+		requestFocus();
+		MainActivity.get().getWindow().setSoftInputMode(
+			WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
+		);
+		return this;
+	}
+}
+
+interface NewDateHandler {
+	public void newDate(Calendar c, DateWidget parent);
 }
 
 class DateWidget extends TextWidget {
@@ -153,8 +167,16 @@ class DateWidget extends TextWidget {
 	public void newValue(Calendar c) {
 		value = c;
 		setText(c.getTime().toString());
+		if (newDateHandler != null)
+			newDateHandler.newDate(c, this);
 	}
 
+	public DateWidget withHandler(NewDateHandler h) {
+		newDateHandler = h;
+		return this;
+	}
+
+	NewDateHandler newDateHandler;
 	Calendar value;
 }
 
@@ -221,13 +243,21 @@ class TripItem {
 	public String where() { return data.get("where").toString(); }
 	public String when() { return data.get("when").toString(); }
 
-	public View editor(Activity a, View parent) {
-		int size = parent.getWidth() / 2 - 30;
+	public View editor(Activity a, int width) {
+		int s = (width - 20) / 2;
 		return new DefaultLayout(LinearLayout.HORIZONTAL, DefaultLayout.horizontalFill)
-			.with(new TextWidget().withWidth(size).withHint("gdzie?"))
+			.with(new TextWidget().withWidth(s).withHint("gdzie?").withFocus())
 			.with(new Space(20, 0))
 			.with(new DateWidget()
-				.withWidth(size)
+				.withHandler(new NewDateHandler() {
+					public void newDate(Calendar c, DateWidget parent) {
+						parent.clearFocus();
+						ViewGroup r = MainActivity.root();
+						a.setContentView(r);
+						r.addView(new TripItem().editor(a, width));
+					}
+				})
+				.withWidth(s)
 				.withHint("kiedy?"));
 	}
 		
