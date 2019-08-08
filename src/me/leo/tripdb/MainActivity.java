@@ -5,11 +5,17 @@ import me.leo.tripdb.R;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
+import android.widget.TimePicker;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.EditText;
@@ -52,7 +58,6 @@ public class MainActivity extends Activity {
 			setContentView(rootView = new DefaultLayout(
 				LinearLayout.HORIZONTAL, DefaultLayout.fillBoth
 			).with(new TripItem().editor(a, root())));
-;
 		}
 
 		Activity a;
@@ -95,14 +100,28 @@ class DefaultLayout extends LinearLayout {
 
 
 class TextWidget extends EditText {
-	public TextWidget() {
+	public static int MULTILINE = 1;
+	public static int ONELINE = 0;
+
+	public TextWidget(int type) {
 		super(MainActivity.get());
 
 		setLayoutParams(new LayoutParams(
 			LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT
 		));
 
+		if (type != MULTILINE) setSingleLine(true);
+
 		setTextAppearance(MainActivity.get(), android.R.attr.textAppearanceLarge);
+	}
+
+	public TextWidget() {
+		this(ONELINE);
+	}
+
+	public TextWidget of (int inputType) {
+		setInputType(inputType);
+		return this;
 	}
 
 	public TextWidget withText(String s) {
@@ -119,6 +138,60 @@ class TextWidget extends EditText {
 		setWidth (pt);
 		return this;
 	}
+}
+
+class DateWidget extends TextWidget {
+	public DateWidget() {
+		super();
+		setInputType(InputType.TYPE_CLASS_DATETIME);
+		setFocusable(false);
+
+		value = Calendar.getInstance();
+		setOnClickListener(new DateTimePicker(this, value));
+	}
+
+	public void newValue(Calendar c) {
+		value = c;
+		setText(c.getTime().toString());
+	}
+
+	Calendar value;
+}
+
+class DateTimePicker implements OnClickListener,
+				DatePickerDialog.OnDateSetListener,
+				TimePickerDialog.OnTimeSetListener{
+	public DateTimePicker (DateWidget resultTaker, Calendar initial) {
+		output = resultTaker;
+		c = initial;
+	}
+
+	public void onClick (View sender) {
+		new DatePickerDialog(MainActivity.get(), this, c.get(Calendar.YEAR),
+			c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)
+		).show();
+	}
+
+	@Override
+	public void onDateSet(DatePicker view, int yr, int mon, int day) {
+		c.set(Calendar.YEAR, yr);
+		c.set(Calendar.MONTH, mon);
+		c.set(Calendar.DAY_OF_MONTH, day);
+
+		new TimePickerDialog(MainActivity.get(), this,
+			c.get(Calendar.HOUR_OF_DAY),
+			c.get(Calendar.MINUTE), false).show();
+	}
+
+	@Override
+	public void onTimeSet(TimePicker view, int hour, int minute) {
+		c.set(Calendar.HOUR_OF_DAY, hour);
+		c.set(Calendar.MINUTE, minute);
+		output.newValue(c);
+	}
+
+	Calendar c;
+	DateWidget output;
 }
 
 class Space extends TextView {
@@ -153,7 +226,9 @@ class TripItem {
 		return new DefaultLayout(LinearLayout.HORIZONTAL, DefaultLayout.horizontalFill)
 			.with(new TextWidget().withWidth(size).withHint("gdzie?"))
 			.with(new Space(20, 0))
-			.with(new TextWidget().withWidth(size).withHint("kiedy?"));
+			.with(new DateWidget()
+				.withWidth(size)
+				.withHint("kiedy?"));
 	}
 		
 	@Override
