@@ -8,6 +8,9 @@ DX=${ANDROID_SDK_PATH}/build-tools/${BUILD_TOOLS_VERSION}/dx
 AAPT=${ANDROID_SDK_PATH}/build-tools/${BUILD_TOOLS_VERSION}/aapt
 ADB=${ANDROID_SDK_PATH}/platform-tools/adb
 JARSIGNER=${JAVA_BIN}/jarsigner 
+TGTCP=target/classes/me/leo/tripdb/
+
+CLASSES=${TGTCP}/TripList.class ${TGTCP}/MainActivity.class ${TGTCP}/Trip.class ${TGTCP}/DefaultLayout.class
 
 all: init target/tripdb.apk test
 
@@ -18,7 +21,7 @@ init:
 target/classes/%.class: src/%.java target/code/me
 	javac -classpath ${ANDROID_JAR}:${JSON_JAR} -sourcepath target/code -sourcepath src -d target/classes target/code/me/leo/tripdb/R.java $<
 
-classes.dex: target/classes/me/leo/tripdb/MainActivity.class
+classes.dex: ${CLASSES}
 	${DX} --dex --output $@ target/classes ${JSON_JAR}
 
 target/code/me target/tripdb.ap_: res/layout/main.xml AndroidManifest.xml
@@ -31,7 +34,7 @@ target/tripdb.apk: classes.dex target/tripdb.ap_
 
 
 
-test:
+test: target/tripdb.apk
 	${ADB} install -r target/tripdb.apk
 	${ADB} shell am start -n me.leo.tripdb/me.leo.tripdb.MainActivity
 
