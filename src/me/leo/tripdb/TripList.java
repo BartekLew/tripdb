@@ -17,6 +17,7 @@ public class TripList {
 		v.setAdapter(new ArrayAdapter<Object> (
 			parent, R.layout.list_items, load().toArray()
 		));
+		lv = v;
 	}
 
 	List<Trip> load() {
@@ -39,5 +40,19 @@ public class TripList {
 		}
 	}
 
+	void add(String json) {
+		try {
+			Trip t = new Trip((JSONArray) new JSONParser().parse(json));
+			data.add(t);
+
+			lv.setAdapter(new ArrayAdapter<Object> (
+				This.get(), R.layout.list_items, load().toArray()
+			));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	ListView lv;
 	ArrayList<Trip> data;
 }

@@ -14,6 +14,8 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.util.Log;
 import android.text.InputType;
+import android.text.TextWatcher;
+import android.text.Editable;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
@@ -30,7 +32,6 @@ import android.view.WindowManager;
 class TripItem {
 	public TripItem (JSONObject o) {
 		data = o;
-		System.out.println("TRIPDB: TI: This=" + This.get());
 	}	
 
 	public TripItem () {
@@ -49,8 +50,10 @@ class TripItem {
 
 	public View editor(Trip trip){
 		int s = (This.root().getWidth() - 20) / 2;
-		return new DefaultLayout(LinearLayout.HORIZONTAL, DefaultLayout.horizontalFill)
-			.with(new TextWidget().withWidth(s).withHint("gdzie?").withFocus())
+		return new DefaultLayout(LinearLayout.HORIZONTAL, 0)
+			.with(new TextWidget()
+				.withWidth(s).withHint("gdzie?")
+				.withModel(data, "where").withFocus())
 			.with(new Space(20, 0))
 			.with(new DateWidget()
 				.withHandler(new NewDateHandler() {
@@ -59,8 +62,17 @@ class TripItem {
 						trip.newItem();
 					}
 				})
+				.withModel(data, "when")
 				.withWidth(s)
 				.withHint("kiedy?"));
+	}
+
+	public String json() {
+		return data.toJSONString();
+	}
+	
+	public JSONObject jsonObj() {
+		return data;
 	}
 		
 	@Override
@@ -108,6 +120,19 @@ class TextWidget extends EditText {
 
 	public TextWidget withWidth(int pt) {
 		setWidth (pt);
+		return this;
+	}
+
+	public TextWidget withModel(JSONObject o, String key) {
+		addTextChangedListener(new TextWatcher() {
+			@Override
+			public void afterTextChanged(Editable e) {
+				o.put(key, getText().toString());
+			}
+			public void onTextChanged(CharSequence c,int a,int b,int d) {}
+			public void beforeTextChanged(CharSequence c,int a,int b,int d) {}
+		});
+		
 		return this;
 	}
 

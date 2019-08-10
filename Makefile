@@ -10,7 +10,7 @@ ADB=${ANDROID_SDK_PATH}/platform-tools/adb
 JARSIGNER=${JAVA_BIN}/jarsigner 
 TGTCP=target/classes/me/leo/tripdb
 
-CLASSES=${TGTCP}/TripList.class ${TGTCP}/This.class ${TGTCP}/TripsUI.class ${TGTCP}/Trip.class ${TGTCP}/DefaultLayout.class ${TGTCP}/TripEditor.class
+CLASSES=${TGTCP}/TripList.class ${TGTCP}/This.class ${TGTCP}/TripsUI.class ${TGTCP}/Trip.class ${TGTCP}/DefaultLayout.class ${TGTCP}/TripEditor.class ${TGTCP}/Button.class
 
 all: init target/tripdb.apk test
 

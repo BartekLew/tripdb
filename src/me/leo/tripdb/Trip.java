@@ -14,8 +14,10 @@ import android.widget.LinearLayout;
 public class Trip {
 	public Trip (JSONArray items) {
 		data = new ArrayList<TripItem>();
-		for(Object i : items)
+		for(Object i : items) {
+			System.out.println("TRIPDB: addTripItem" + i.toString());
 			data.add(new TripItem((JSONObject) i));
+		}
 	}
 
 	public Trip() {
@@ -27,7 +29,7 @@ public class Trip {
 	public ViewGroup editor() {
 		if(editor == null)
 			editor = new DefaultLayout(
-				LinearLayout.VERTICAL, DefaultLayout.fillBoth
+				LinearLayout.VERTICAL, 0
 			).with(childEditors());
 		return editor;
 	}
@@ -46,6 +48,15 @@ public class Trip {
 		TripItem i = new TripItem();
 		data.add(i);
 		editor().addView(i.editor(this));
+	}
+
+	public String json() {
+		JSONArray a = new JSONArray();
+		for(TripItem i: data)
+			if(!i.where().isEmpty())
+				a.add(i.jsonObj());
+
+		return a.toJSONString();
 	}
 
 	@Override

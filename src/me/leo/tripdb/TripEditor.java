@@ -2,6 +2,8 @@ package me.leo.tripdb;
 
 import android.widget.LinearLayout;
 import android.os.Bundle;
+import android.view.View.OnClickListener;
+import android.view.View;
 
 public class TripEditor extends This {
 	public void onCreate(Bundle state) {
@@ -10,7 +12,12 @@ public class TripEditor extends This {
 		trip = new Trip();
 		setContentView(rootView = new DefaultLayout(
 			LinearLayout.VERTICAL, DefaultLayout.fillBoth
-		).with(trip.editor()));
+		).with(trip.editor())
+			.with(new Button("Zatwierdź", new OnClickListener() {
+				public void onClick(View button) {
+					respond(trip.json());
+				}
+			})));
 	}
 
 	Trip trip;

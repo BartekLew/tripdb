@@ -39,6 +39,10 @@ public class TripsUI extends This {
 		trips = new TripList(this, findViewById(R.id.trips));
 	}
 
+	public void onActivityResult(int reqCode, int resultCode, Intent i) {
+		trips.add(i.getStringExtra("Trip"));
+	}
+
 	private static int ADD_REQ_CODE = 0x0fe01;
 	TripList trips;
 }
