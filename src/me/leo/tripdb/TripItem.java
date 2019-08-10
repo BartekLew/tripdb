@@ -30,6 +30,7 @@ import android.view.WindowManager;
 class TripItem {
 	public TripItem (JSONObject o) {
 		data = o;
+		System.out.println("TRIPDB: TI: This=" + This.get());
 	}	
 
 	public TripItem () {
@@ -46,18 +47,16 @@ class TripItem {
 	public String where() { return data.get("where").toString(); }
 	public String when() { return data.get("when").toString(); }
 
-	public View editor(Activity a, int width) {
-		int s = (width - 20) / 2;
+	public View editor(Trip trip){
+		int s = (This.root().getWidth() - 20) / 2;
 		return new DefaultLayout(LinearLayout.HORIZONTAL, DefaultLayout.horizontalFill)
 			.with(new TextWidget().withWidth(s).withHint("gdzie?").withFocus())
 			.with(new Space(20, 0))
 			.with(new DateWidget()
 				.withHandler(new NewDateHandler() {
-					public void newDate(Calendar c, DateWidget parent) {
-						parent.clearFocus();
-						ViewGroup r = MainActivity.root();
-						a.setContentView(r);
-						r.addView(new TripItem().editor(a, width));
+					public void newDate(Calendar c, DateWidget sender) {
+						sender.clearFocus();
+						trip.newItem();
 					}
 				})
 				.withWidth(s)
@@ -77,7 +76,7 @@ class TextWidget extends EditText {
 	public static int ONELINE = 0;
 
 	public TextWidget(int type) {
-		super(MainActivity.get());
+		super(This.get());
 
 		setLayoutParams(new LayoutParams(
 			LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT
@@ -85,7 +84,7 @@ class TextWidget extends EditText {
 
 		if (type != MULTILINE) setSingleLine(true);
 
-		setTextAppearance(MainActivity.get(), android.R.attr.textAppearanceLarge);
+		setTextAppearance(This.get(), android.R.attr.textAppearanceLarge);
 	}
 
 	public TextWidget() {
@@ -114,7 +113,7 @@ class TextWidget extends EditText {
 
 	public TextWidget withFocus() {
 		requestFocus();
-		MainActivity.get().getWindow().setSoftInputMode(
+		This.get().getWindow().setSoftInputMode(
 			WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
 		);
 		return this;
@@ -160,7 +159,7 @@ class DateTimePicker implements OnClickListener,
 	}
 
 	public void onClick (View sender) {
-		new DatePickerDialog(MainActivity.get(), this, c.get(Calendar.YEAR),
+		new DatePickerDialog(This.get(), this, c.get(Calendar.YEAR),
 			c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)
 		).show();
 	}
@@ -171,7 +170,7 @@ class DateTimePicker implements OnClickListener,
 		c.set(Calendar.MONTH, mon);
 		c.set(Calendar.DAY_OF_MONTH, day);
 
-		new TimePickerDialog(MainActivity.get(), this,
+		new TimePickerDialog(This.get(), this,
 			c.get(Calendar.HOUR_OF_DAY),
 			c.get(Calendar.MINUTE), false).show();
 	}
@@ -189,7 +188,7 @@ class DateTimePicker implements OnClickListener,
 
 class Space extends TextView {
 	public Space(int w, int h) {
-		super(MainActivity.get());
+		super(This.get());
 		setWidth(w);
 		setHeight(h);
 	}

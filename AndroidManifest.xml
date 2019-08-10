@@ -12,12 +12,15 @@
         android:label="Moje wycieczki"
 	android:debuggable="true">
         <activity
-            android:name="me.leo.tripdb.MainActivity"
+            android:name="me.leo.tripdb.TripsUI"
             android:label="Moje wycieczki">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+	<activity
+		android:name="me.leo.tripdb.TripEditor"
+		android:label="Dodaj wycieczkę"/>
     </application>
 </manifest>
