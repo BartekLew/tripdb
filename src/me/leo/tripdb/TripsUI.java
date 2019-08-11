@@ -16,6 +16,8 @@ import android.widget.TextView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -31,19 +33,38 @@ public class TripsUI extends This {
 				public void onClick (View button) {
 					startActivityForResult(
 						new Intent(get(), TripEditor.class),
-						ADD_REQ_CODE
+						NEW_REQ_CODE
 					);
 				}
 			}
 		);
-		trips = new TripList(this, findViewById(R.id.trips));
+
+		ListView tripsView = findViewById(R.id.trips);
+		trips = new TripList(this, tripsView);
+
+		tripsView.setOnItemClickListener(new OnItemClickListener() {
+			public void onItemClick(AdapterView<?> lv, View v, int position, long id) {
+				Intent i = new Intent(get(), TripEditor.class);
+				i.putExtra("Trip", trips.at(position).json());
+				i.putExtra("pos", position);
+				startActivityForResult(i, ADD_REQ_CODE);
+			}
+		});
 	}
 
 	public void onActivityResult(int reqCode, int resultCode, Intent i) {
-		trips.add(i.getStringExtra("Trip"));
+		try {
+			if(reqCode == NEW_REQ_CODE)
+				trips.add(i.getStringExtra("Trip"));
+			else
+				trips.update(i.getIntExtra("pos", -1),
+						i.getStringExtra("Trip")
+				);
+		} catch (Exception e) {} // case of cancelling add/new activity
 	}
 
-	private static int ADD_REQ_CODE = 0x0fe01;
+	private static int NEW_REQ_CODE = 0x0fe01;
+	private static int ADD_REQ_CODE = 0x0fe02;
 	TripList trips;
 }
 

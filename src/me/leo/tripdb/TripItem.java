@@ -32,6 +32,7 @@ import android.view.WindowManager;
 class TripItem {
 	public TripItem (JSONObject o) {
 		data = o;
+		System.out.println("TRIPDB: " + this);
 	}	
 
 	public TripItem () {
@@ -124,6 +125,7 @@ class TextWidget extends EditText {
 	}
 
 	public TextWidget withModel(JSONObject o, String key) {
+		setText(o.get(key).toString());
 		addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable e) {

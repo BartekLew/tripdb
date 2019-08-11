@@ -14,10 +14,9 @@ import android.widget.ListView;
 
 public class TripList {
 	public TripList (Activity parent, ListView v) {
-		v.setAdapter(new ArrayAdapter<Object> (
-			parent, R.layout.list_items, load().toArray()
-		));
 		lv = v;
+
+		refresh();
 	}
 
 	List<Trip> load() {
@@ -40,17 +39,36 @@ public class TripList {
 		}
 	}
 
-	void add(String json) {
+	public Trip at(int index) {
+		return data.get(index);
+	}
+
+	public void add(String json) {
 		try {
-			Trip t = new Trip((JSONArray) new JSONParser().parse(json));
+			Trip t = new Trip(json);
 			data.add(t);
 
-			lv.setAdapter(new ArrayAdapter<Object> (
-				This.get(), R.layout.list_items, load().toArray()
-			));
+			refresh();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void update(int idx, String json) {
+		try {
+			Trip t = new Trip(json);
+			data.set(idx, t);
+
+			refresh();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void refresh() {
+		lv.setAdapter(new ArrayAdapter<Object> (
+			This.get(), R.layout.list_items, load().toArray()
+		));
 	}
 
 	ListView lv;

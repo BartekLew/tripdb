@@ -9,7 +9,17 @@ public class TripEditor extends This {
 	public void onCreate(Bundle state) {
 		super.onCreate(state);
 
-		trip = new Trip();
+		String tripJson = getIntent().getStringExtra("Trip");
+		if(tripJson == null)
+			trip = new Trip();
+		else
+			try {
+				trip = new Trip(tripJson);
+			} catch (Exception e) {
+				e.printStackTrace();
+				trip = new Trip();
+			}
+
 		setContentView(rootView = new DefaultLayout(
 			LinearLayout.VERTICAL, DefaultLayout.fillBoth
 		).with(trip.editor())

@@ -3,6 +3,7 @@ package me.leo.tripdb;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +16,13 @@ public class Trip {
 	public Trip (JSONArray items) {
 		data = new ArrayList<TripItem>();
 		for(Object i : items) {
-			System.out.println("TRIPDB: addTripItem" + i.toString());
 			data.add(new TripItem((JSONObject) i));
 		}
+	}
+
+	public Trip (String json) throws ParseException {
+		this((JSONArray) new JSONParser().parse(json));
+		System.out.println("TRIPDB: " + this);
 	}
 
 	public Trip() {
