@@ -40,6 +40,11 @@ class TripItem {
 		data.put("when", "");
 	}
 		
+	public TripItem (TripItem base) {
+		this();
+		data.put("when", base.when());
+	}
+
 	public TripItem (String where, LocalDateTime when) {
 		data.put("where", where);
 		data.put("when", when);
@@ -50,6 +55,7 @@ class TripItem {
 
 	public View editor(Trip trip){
 		int s = (This.width() - 20) / 2;
+		TripItem item = this;
 		return new DefaultLayout(LinearLayout.HORIZONTAL, 0)
 			.with(new TextWidget()
 				.withWidth(s).withHint("gdzie?")
@@ -59,7 +65,7 @@ class TripItem {
 				.withHandler(new NewDateHandler() {
 					public void newDate(Calendar c, DateWidget sender) {
 						sender.clearFocus();
-						trip.newItem();
+						trip.newItem(item);
 					}
 				})
 				.withModel(data, "when")

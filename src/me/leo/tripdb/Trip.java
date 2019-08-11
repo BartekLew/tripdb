@@ -54,6 +54,17 @@ public class Trip {
 		editor().addView(i.editor(this));
 	}
 
+	public void newItem(TripItem base) {
+		if(base == data.get(data.size()-1)) {
+			TripItem i = new TripItem(base);
+			data.add(i);
+			editor().addView(i.editor(this));
+		} else {
+			int idx = data.indexOf(base) + 1;
+			editor().getChildAt(idx).requestFocus();
+		}
+	}
+
 	public String json() {
 		JSONArray a = new JSONArray();
 		for(TripItem i: data)
