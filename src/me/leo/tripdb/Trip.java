@@ -22,7 +22,6 @@ public class Trip {
 
 	public Trip (String json) throws ParseException {
 		this((JSONArray) new JSONParser().parse(json));
-		System.out.println("TRIPDB: " + this);
 	}
 
 	public Trip() {

@@ -32,7 +32,6 @@ import android.view.WindowManager;
 class TripItem {
 	public TripItem (JSONObject o) {
 		data = o;
-		System.out.println("TRIPDB: " + this);
 	}	
 
 	public TripItem () {
@@ -50,7 +49,7 @@ class TripItem {
 	public String when() { return data.get("when").toString(); }
 
 	public View editor(Trip trip){
-		int s = (This.root().getWidth() - 20) / 2;
+		int s = (This.width() - 20) / 2;
 		return new DefaultLayout(LinearLayout.HORIZONTAL, 0)
 			.with(new TextWidget()
 				.withWidth(s).withHint("gdzie?")
