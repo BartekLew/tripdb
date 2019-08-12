@@ -8,7 +8,10 @@ import org.json.simple.parser.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
@@ -34,8 +37,17 @@ public class Trip {
 		if(editor == null)
 			editor = new DefaultLayout(
 				LinearLayout.VERTICAL, 0
-			).with(childEditors());
+				).with(toolbar())
+				.with(routeEd = new DefaultLayout(
+					LinearLayout.VERTICAL, 0
+					).with(childEditors()));
 		return editor;
+	}
+
+	public ViewGroup routeEditor() {
+		if(editor == null) editor();
+
+		return routeEd;
 	}
 
 	private List<View> childEditors() {
@@ -48,20 +60,44 @@ public class Trip {
 		return l;
 	}
 
+	private View toolbar() {
+		return new DefaultLayout(
+			LinearLayout.HORIZONTAL, DefaultLayout.horizontalFill
+			).with(new Button("Mapa",
+				new OnClickListener() {
+					public void onClick(View v) {
+						callMap();
+					}
+				}
+			));
+	}
+
+	private void callMap() {
+		This.get().startActivity(
+			new Intent(Intent.ACTION_VIEW,
+				Uri.parse("http://maps.google.com/maps"
+					+ routeStr())));
+	}
+
+	private String routeStr() {
+		return "?saddr=" + data.get(0).where()
+				+ "&daddr=" + data.get(data.size()-2).where();
+	}
+
 	public void newItem() {
 		TripItem i = new TripItem();
 		data.add(i);
-		editor().addView(i.editor(this));
+		routeEditor().addView(i.editor(this));
 	}
 
 	public void newItem(TripItem base) {
 		if(base == data.get(data.size()-1)) {
 			TripItem i = new TripItem(base);
 			data.add(i);
-			editor().addView(i.editor(this));
+			routeEditor().addView(i.editor(this));
 		} else {
 			int idx = data.indexOf(base) + 1;
-			editor().getChildAt(idx).requestFocus();
+			routeEditor().getChildAt(idx).requestFocus();
 		}
 	}
 
@@ -80,6 +116,7 @@ public class Trip {
 	}
 
 	ViewGroup editor;
+	ViewGroup routeEd;
 	ArrayList<TripItem> data;
 }
 
