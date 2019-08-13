@@ -65,7 +65,8 @@ public class Trip {
 	private View toolbar() {
 		return new DefaultLayout(
 			LinearLayout.HORIZONTAL, DefaultLayout.horizontalFill
-			).with(new Button("Mapa",
+			).withPadding(0,0,0,0)
+			.with(new Button("Mapa",
 				new OnClickListener() {
 					public void onClick(View v) {
 						callMap();
@@ -81,7 +82,11 @@ public class Trip {
 						This.get().startService(i);
 					}
 				}
-			));
+			)).with(new Button("Zatwierdź", new OnClickListener() {
+				public void onClick(View button) {
+					This.get().respond(json());
+				}
+			}));
 	}
 
 	private void callMap() {

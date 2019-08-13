@@ -23,6 +23,11 @@ public class DefaultLayout extends LinearLayout {
 		setPadding(10, 10, 10, 10);
 	}
 
+	public DefaultLayout withPadding(int l, int t, int r, int b) {
+		setPadding(l, t, r, b);
+		return this;
+	}
+
 	public DefaultLayout with(View v) {
 		addView(v);
 		return this;

@@ -20,14 +20,7 @@ public class TripEditor extends This {
 				trip = new Trip();
 			}
 
-		setContentView(rootView = new DefaultLayout(
-			LinearLayout.VERTICAL, DefaultLayout.fillBoth
-		).with(trip.editor())
-			.with(new Button("Zatwierdź", new OnClickListener() {
-				public void onClick(View button) {
-					respond(trip.json());
-				}
-			})));
+		setContentView(rootView = trip.editor());
 	}
 
 	Trip trip;

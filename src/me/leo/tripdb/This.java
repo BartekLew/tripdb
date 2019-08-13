@@ -51,7 +51,7 @@ public class This extends Activity {
 	public static int height() { return single.metrics.heightPixels; }
 	DisplayMetrics metrics;
 
-	public static Activity get() { return single; }
+	public static This get() { return single; }
 	public static ViewGroup root() {return rootView;}
 
 	static This single;
