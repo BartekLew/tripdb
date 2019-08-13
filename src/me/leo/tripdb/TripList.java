@@ -25,7 +25,7 @@ public class TripList {
 				data = new ArrayList<Trip>();
 
 				for (Object obj: (JSONArray) new JSONParser().parse(
-					"[[{\"where\": \"Warszawa\", \"when\": \"12.06.2019 12:00\"}, {\"where\": \"Gdańsk\", \"when\": \"12.06.2019 14:00\"}]]"
+					"[[{\"where\": \"Warszawa\", \"when\": \"12.06 12:00 (2019)\"}, {\"where\": \"Gdańsk\", \"when\": \"12.06 14:00 (2019)\"}]]"
 				)){
 					data.add(new Trip((JSONArray) obj));
 				}

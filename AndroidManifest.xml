@@ -7,6 +7,9 @@
     <uses-sdk android:minSdkVersion="15"
 	android:targetSdkVersion="29" />
 
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.ACTION_MANAGE_OVERLAY_PERMISSION" /> 
+
     <application
         android:icon="@mipmap/icon"
         android:label="Moje wycieczki"
@@ -22,5 +25,9 @@
 	<activity
 		android:name="me.leo.tripdb.TripEditor"
 		android:label="Dodaj wycieczkę"/>
+
+	<service
+		android:name="me.leo.tripdb.Follow"
+		android:exported="false" />
     </application>
 </manifest>

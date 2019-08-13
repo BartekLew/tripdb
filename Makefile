@@ -3,7 +3,6 @@ BUILD_TOOLS_VERSION=29.0.1
 JAVA_BIN=/snap/android-studio/77/android-studio/jre/bin
 ANDROID_SDK_PATH=${HOME}/Android/Sdk
 ANDROID_JAR=${ANDROID_SDK_PATH}/platforms/android-${ANDROID_VERSION}/android.jar
-JSON_JAR=deps/json-simple-1.1.1.jar
 DX=${ANDROID_SDK_PATH}/build-tools/${BUILD_TOOLS_VERSION}/dx
 AAPT=${ANDROID_SDK_PATH}/build-tools/${BUILD_TOOLS_VERSION}/aapt
 ADB=${ANDROID_SDK_PATH}/platform-tools/adb
@@ -12,17 +11,21 @@ TGTCP=target/classes/me/leo/tripdb
 
 CLASSES=${TGTCP}/TripList.class ${TGTCP}/This.class ${TGTCP}/TripsUI.class ${TGTCP}/Trip.class ${TGTCP}/DefaultLayout.class ${TGTCP}/TripEditor.class ${TGTCP}/Button.class
 
-all: init target/tripdb.apk test
+all: clean init target/tripdb.apk test
 
-init:
+deps-ok:
+	./deps.sh
+
+init: .deps-ok
 	mkdir -p target/classes target/code
 
 
 target/classes/%.class: src/%.java target/code/me
-	javac -classpath ${ANDROID_JAR}:${JSON_JAR} -sourcepath target/code -sourcepath src -d target/classes target/code/me/leo/tripdb/R.java $<
+	@-rm $@
+	javac -classpath $(shell cat .deps-ok)${ANDROID_JAR} -sourcepath target/code -sourcepath src -d target/classes target/code/me/leo/tripdb/R.java $<
 
 classes.dex: ${CLASSES}
-	${DX} --dex --output $@ target/classes ${JSON_JAR}
+	${DX} --dex --output $@ target/classes deps/*
 
 target/code/me target/tripdb.ap_: res/layout/main.xml AndroidManifest.xml
 	${AAPT} package -I ${ANDROID_JAR} -f -M AndroidManifest.xml -m -J target/code -S res -F target/tripdb.ap_

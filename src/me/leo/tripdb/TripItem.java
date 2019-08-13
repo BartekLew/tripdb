@@ -7,7 +7,9 @@ import org.json.simple.parser.JSONParser;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Date;
 import java.time.LocalDateTime;
+import java.text.SimpleDateFormat;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
@@ -29,9 +31,14 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
 
+
+
 class TripItem {
 	public TripItem (JSONObject o) {
 		data = o;
+		try {
+			realdate = datefmt.parse(when());
+		} catch (Exception e){}
 	}	
 
 	public TripItem () {
@@ -43,6 +50,9 @@ class TripItem {
 	public TripItem (TripItem base) {
 		this();
 		data.put("when", base.when());
+		try {
+			realdate = datefmt.parse(when());
+		} catch (Exception e){}
 	}
 
 	public TripItem (String where, LocalDateTime when) {
@@ -52,6 +62,27 @@ class TripItem {
 
 	public String where() { return data.get("where").toString(); }
 	public String when() { return data.get("when").toString(); }
+	public String relativeWhen() {
+		long diff = realdate.getTime() - new Date().getTime();
+		boolean past = diff < 0;
+		diff = Math.abs(diff);
+		long sec = diff / 1000;
+		long min = sec / 60;
+		sec = sec % 60;
+		long hr = min / 60;
+		min = min % 60;
+		long d = hr / 24;
+		hr = hr % 24;
+
+		if(past)
+			return String.format("%d dni %d:%d:%d temu",
+				d, hr, min, sec
+			);
+		else
+			return String.format("za %d dni %d:%d:%d",
+				d, hr, min, sec
+			);
+	}
 
 	public View editor(Trip trip){
 		int s = (This.width() - 20) / 2;
@@ -61,14 +92,15 @@ class TripItem {
 				.withWidth(s).withHint("gdzie?")
 				.withModel(data, "where").withFocus())
 			.with(new Space(20, 0))
-			.with(new DateWidget()
+			.with(new DateWidget(realdate)
 				.withHandler(new NewDateHandler() {
 					public void newDate(Calendar c, DateWidget sender) {
+						data.put("when", datefmt.format(c.getTime()));
+						realdate = c.getTime();
 						sender.clearFocus();
 						trip.newItem(item);
 					}
 				})
-				.withModel(data, "when")
 				.withWidth(s)
 				.withHint("kiedy?"));
 	}
@@ -86,6 +118,8 @@ class TripItem {
 		return String.format("%s @ %s", where(), when());
 	}
 
+	public static final SimpleDateFormat datefmt = new SimpleDateFormat("dd.MM HH:mm (yyyy)");
+	Date realdate;
 	JSONObject data;
 }
 
@@ -166,9 +200,18 @@ class DateWidget extends TextWidget {
 		setOnClickListener(new DateTimePicker(this, value));
 	}
 
+	public DateWidget(Date d) {
+		this();
+		if(d != null) {
+			value = Calendar.getInstance();
+			value.setTime(d);
+			setText(TripItem.datefmt.format(d));
+		}
+	}
+
 	public void newValue(Calendar c) {
 		value = c;
-		setText(c.getTime().toString());
+		setText(TripItem.datefmt.format(c.getTime()));
 		if (newDateHandler != null)
 			newDateHandler.newDate(c, this);
 	}

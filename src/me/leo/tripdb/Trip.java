@@ -8,11 +8,13 @@ import org.json.simple.parser.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 
 public class Trip {
@@ -69,6 +71,16 @@ public class Trip {
 						callMap();
 					}
 				}
+			)).with(new Button("Śledź",
+				new OnClickListener() {
+					public void onClick(View v) {
+						This.ensurePerm("android.permission.SYSTEM_ALERT_WINDOW");
+						This.ensurePerm("android.permission.ACTION_MANAGE_OVERLAY_PERMISSION");
+						Intent i = new Intent(This.get(), Follow.class);
+						i.putExtra("Trip", json());
+						This.get().startService(i);
+					}
+				}
 			));
 	}
 
@@ -108,6 +120,16 @@ public class Trip {
 				a.add(i.jsonObj());
 
 		return a.toJSONString();
+	}
+
+	public String relativeTiming() {
+		String result = "";
+		for(TripItem i: data) {
+			result += String.format("%s: %s\n",
+				i.where(), i.relativeWhen()
+			);
+		}
+		return result;
 	}
 
 	@Override
