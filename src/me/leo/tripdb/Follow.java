@@ -1,5 +1,8 @@
 package me.leo.tripdb;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.PixelFormat;
@@ -9,6 +12,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 import android.os.IBinder;
+import android.os.Handler;
 
 public class Follow extends Service {
 	@Override
@@ -61,7 +65,23 @@ public class Follow extends Service {
 
 		try {
 			trip = new Trip(json);
-			msg.setText(trip.relativeTiming());
+
+			Handler handler = new Handler();
+			timer = new Timer();
+			timer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					// This is must because Views can be edited only
+					// by threads they are created with.
+					handler.post(new Runnable() {
+						@Override
+						public void run() {
+							msg.setText(trip.relativeTiming());
+						}
+					});
+				}
+			}, 0, 60000);
+
 			return START_NOT_STICKY;
 		} catch (Exception e) {
 			System.err.println("tripdb/Follow/init caught" + e.toString());
@@ -80,6 +100,7 @@ public class Follow extends Service {
 	@Override
 	public IBinder onBind(Intent par) { return null; }
 
+	Timer timer;
 	Trip trip;
 	WindowManager wm;
 	TextView msg;

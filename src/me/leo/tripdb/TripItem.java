@@ -75,12 +75,12 @@ class TripItem {
 		hr = hr % 24;
 
 		if(past)
-			return String.format("%d dni %d:%d:%d temu",
-				d, hr, min, sec
+			return String.format("%d dni %02d:%02d temu",
+				d, hr, min
 			);
 		else
-			return String.format("za %d dni %d:%d:%d",
-				d, hr, min, sec
+			return String.format("za %d dni %.0d:%02d",
+				d, hr, min
 			);
 	}
 
